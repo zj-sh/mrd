@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package mrd.chart;
+
+option go_package = "mrd/chart";
+
+import "google/protobuf/timestamp.proto";
+import "chart/chart.proto";
+
+message Index {
+    // @gotags: json:"version" yaml:"version"
+    string version = 1;
+    // @gotags: json:"generated" yaml:"generated"
+    google.protobuf.Timestamp generated = 2;
+    // @gotags: json:"suites" yaml:"suites"
+    repeated Chart suites = 3;
+    // @gotags: json:"toolkits" yaml:"toolkits"
+    repeated Chart toolkits = 4;
+}

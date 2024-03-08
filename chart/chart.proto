@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package mrd.chart;
+
+option go_package = "mrd/chart";
+
+message Chart {
+    // @gotags: json:"name" yaml:"name"
+    string name = 1;
+    // @gotags: json:"fullName" yaml:"fullName"
+    string fullName = 2;
+    // @gotags: json:"version" yaml:"version"
+    string version = 3;
+    // @gotags: json:"command" yaml:"command"
+    string command = 4;
+    // @gotags: json:"moredVersion" yaml:"moredVersion"
+    string moredVersion = 5;
+    // @gotags: json:"os" yaml:"os"
+    repeated string os = 6;
+    // @gotags: json:"arch" yaml:"arch"
+    repeated string arch = 7;
+    // @gotags: json:"effects" yaml:"effects"
+    repeated int64 effects = 8;
+    // @gotags: json:"depTools" yaml:"depTools"
+    repeated Dependency depTools = 9;
+    // @gotags: json:"depSuites" yaml:"depSuites"
+    repeated Dependency depSuites = 10;
+    // @gotags: json:"metadata" yaml:"metadata"
+    Metadata metadata = 11;
+}
+message Dependency {
+    // @gotags: json:"name" yaml:"name"
+    string name = 1;
+    // @gotags: json:"version" yaml:"version"
+    string version = 2;
+    // @gotags: json:"repo" yaml:"repo"
+    string repo = 3;
+}
+message Metadata {
+    // @gotags: json:"icon" yaml:"icon"
+    string icon = 1;
+    // @gotags: json:"description" yaml:"description"
+    string description = 2;
+    // @gotags: json:"digest" yaml:"digest"
+    string digest = 3;
+    // @gotags: json:"keywords" yaml:"keywords"
+    repeated string keywords = 4;
+    // @gotags: json:"maintainers" yaml:"maintainers"
+    repeated Maintainer maintainers = 5;
+}
+message Maintainer{
+    // @gotags: json:"name" yaml:"name"
+    string name = 1;
+    // @gotags: json:"email" yaml:"email"
+    string email = 2;
+    // @gotags: json:"home" yaml:"home"
+    string home = 3;
+}
