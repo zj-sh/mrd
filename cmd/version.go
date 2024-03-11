@@ -5,15 +5,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Print the version number",
-	Args:  cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		color.Blue("v1.0.0")
-	},
+type versionOpts struct {
+	*rootOpts
 }
 
-func init() {
-	rootCmd.AddCommand(versionCmd)
+type versionCmd struct {
+	*versionOpts
+	cmd *cobra.Command
+}
+
+func newVersionCmd(opts *rootOpts) *versionCmd {
+	c := &versionCmd{
+		versionOpts: &versionOpts{rootOpts: opts},
+	}
+	c.cmd = &cobra.Command{
+		Use:   "version",
+		Short: "Print the version number",
+		Args:  cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			color.Blue(c.version)
+		},
+	}
+	return c
 }

@@ -3,8 +3,9 @@ package util
 import (
 	"archive/tar"
 	"compress/gzip"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
-	"github.com/fatih/color"
 	"io"
 	"os"
 	"path/filepath"
@@ -15,6 +16,18 @@ import (
 func IsExisted(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil || os.IsExist(err)
+}
+func HasPatternFile(path string, pattern string) bool {
+	fis, err := os.ReadDir(path)
+	if err != nil {
+		return false
+	}
+	for _, fi := range fis {
+		if ok, _ := regexp.MatchString(pattern, fi.Name()); ok {
+			return true
+		}
+	}
+	return false
 }
 func Compress(src, dest string, exclude ...string) error {
 	d, _ := os.Create(dest)
@@ -30,7 +43,7 @@ func Compress(src, dest string, exclude ...string) error {
 					return nil
 				}
 			}
-			color.Blue("compressing: %s %s", Filesize(fi.Size()), filename)
+			fmt.Println(fmt.Sprintf("=> %s %s", Filesize(fi.Size()), filename))
 			file, err := os.Open(filename)
 			if err != nil {
 				return err
@@ -122,6 +135,9 @@ func createFile(name string) (*os.File, error) {
 }
 
 func Filesize(size int64) string {
+	if size < 1024 {
+		return fmt.Sprintf("%dB", size)
+	}
 	sz := Div(size, 1024)
 	if sz < 1024 {
 		return fmt.Sprintf("%dKB", int64(sz))
@@ -134,4 +150,23 @@ func Filesize(size int64) string {
 		}
 	}
 	return ""
+}
+
+func WriteFile(filename string, data []byte) error {
+	err := os.MkdirAll(filepath.Dir(filename), os.ModePerm)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filename, data, os.ModePerm)
+}
+
+func FileDigest(filename string) string {
+	f, err := os.Open(filename)
+	if err != nil {
+		return ""
+	}
+	defer f.Close()
+	md5h := md5.New()
+	_, _ = io.Copy(md5h, f)
+	return hex.EncodeToString(md5h.Sum(nil))
 }
