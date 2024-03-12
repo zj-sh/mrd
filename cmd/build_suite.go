@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/zj-sh/mrd/util"
+	"github.com/zohu/reg"
 	"io/fs"
 	"os"
 	"path"
@@ -13,9 +14,10 @@ import (
 )
 
 const (
-	DefaultSuiteDist     = "suite"
-	DefaultSuiteMainFile = "suite"
-	DefaultSuitePattern  = `^suite(\.\w+)?$`
+	DefaultSuiteDist           = "suite"
+	DefaultSuiteMainFile       = "suite"
+	DefaultSuitePattern        = `^suite(\.\w+)?$`
+	DefaultSuiteCommandPattern = `(^@$)|(^@\x20.*)|(.*\x20@$)|(.*\x20@\x20.*)`
 )
 
 type suiteOpts struct {
@@ -62,8 +64,8 @@ func (c *suiteCmd) suite(dir string) (*Chart, error) {
 	if err = c.verifyMust(chart); err != nil {
 		return nil, err
 	}
-	if !strings.Contains(chart.Command, "{file}") {
-		return nil, fmt.Errorf("command must contain the {file} placeholder")
+	if reg.String(chart.Command).Match(DefaultSuiteCommandPattern).AllowZero().NotB() {
+		return nil, fmt.Errorf("command must not contain the @ symbol")
 	}
 	if len(chart.Effects) == 0 {
 		return nil, fmt.Errorf("effects is required")
@@ -73,7 +75,7 @@ func (c *suiteCmd) suite(dir string) (*Chart, error) {
 		FullName:     util.FirstTruthValue(chart.FullName, chart.Name),
 		Version:      chart.Version,
 		MoredVersion: util.FirstTruthValue(chart.MoredVersion, ">=0.0.0"),
-		Command:      util.FirstTruthValue(chart.Command, "{file}"),
+		Command:      util.FirstTruthValue(chart.Command, "@"),
 		Effects:      chart.Effects,
 		Os:           util.FirstTruthValue(chart.Os, []string{"linux", "darwin"}),
 		Arch:         util.FirstTruthValue(chart.Arch, []string{"amd64", "arm64"}),
